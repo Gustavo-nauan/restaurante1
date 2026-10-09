@@ -156,17 +156,17 @@ body { min-height: 100vh; min-height: 100dvh; }
 
 .btn-cozinha {
   display: flex; align-items: center; justify-content: center; width: 100%;
-  min-height: var(--target-cozinha); padding: 0 var(--space-5);
+  min-height: 64px; padding: 0 var(--space-5);
   border: 1px solid transparent; border-radius: var(--radius-control);
   background: var(--color-brasa); color: var(--color-branco);
-  font-size: var(--text-cozinha-botao); font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  font-size: 18px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
   transition: background-color var(--motion-fast), border-color var(--motion-fast);
 }
 .btn-cozinha:hover, .btn-cozinha:active { background: var(--color-brasa-escura); }
 .btn-cozinha:disabled { background: var(--color-areia); color: var(--color-fumaca); cursor: default; }
 .btn-cozinha--perigo {
-  min-height: var(--target-cliente); background: transparent; border-color: var(--status-recebido); color: var(--status-recebido);
-  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em;
+  min-height: 56px; background: transparent; border-color: var(--status-recebido); color: var(--status-recebido);
+  font-size: 16px; font-weight: 600; letter-spacing: .04em;
 }
 .btn-cozinha--perigo:hover, .btn-cozinha--perigo:active { background: var(--status-recebido-bg); }
 .btn-cozinha--perigo:disabled { background: transparent; border-color: var(--color-linha); color: var(--color-fumaca); }

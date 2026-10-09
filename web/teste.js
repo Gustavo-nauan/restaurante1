@@ -509,7 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('btn-abrir-carrinho').addEventListener('click', abrirCarrinho);
   $('btn-fechar-carrinho').addEventListener('click', fecharCarrinho);
-  $('overlay').addEventListener('click', fecharCarrinho);
+  $('overlay').addEventListener('click', (e) => {
+    if (e.target === $('overlay')) fecharCarrinho();
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && $('folha').classList.contains('aberta')) fecharCarrinho();
   });
