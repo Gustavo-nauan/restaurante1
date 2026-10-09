@@ -1,8 +1,4 @@
 {
   "outputDirectory": "web",
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/cozinha.html", "destination": "/cozinha" },
-    { "source": "/pedido.html", "destination": "/pedido" }
-  ]
+  "cleanUrls": true
 }
