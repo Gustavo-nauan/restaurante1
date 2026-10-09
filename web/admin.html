@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin - Gestão da Loja</title>
+  <meta name="description" content="Painel administrativo da loja">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Ícones SVG -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></symbol>
+    <symbol id="i-loja" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-seta-cima" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></symbol>
+    <symbol id="i-seta-baixo" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  </svg>
+
+  <!-- Login (Reutilizando estrutura) -->
+  <main class="login" id="tela-login">
+    <div class="login__cartao">
+      <div class="login__marca">
+        <div class="login__logo" aria-hidden="true"><svg class="icone icone--24"><use href="#i-loja"/></svg></div>
+        <h1 class="t-heading-sm">Administração</h1>
+      </div>
+      <form class="login__form" id="form-login" novalidate>
+        <div class="campo">
+          <label class="campo__rotulo" for="email">E-mail</label>
+          <input class="campo__entrada" id="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="senha">Senha</label>
+          <input class="campo__entrada" id="senha" type="password" autocomplete="current-password" required>
+        </div>
+        <p class="login__erro" id="login-erro" role="alert" hidden>
+          <svg class="icone icone--24" aria-hidden="true"><use href="#i-alerta"/></svg>
+          <span id="login-erro-texto"></span>
+        </p>
+        <button type="submit" class="btn btn--primario btn--bloco" id="btn-entrar">Acessar Painel</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Painel -->
+  <div class="admin-layout" id="tela-painel" hidden>
+    <aside class="admin-sidebar">
+      <div class="sidebar__marca">
+        <h2 class="t-subheading" id="loja-nome">Restaurante</h2>
+      </div>
+      <nav class="sidebar__nav" aria-label="Menu principal">
+        <button type="button" class="nav-item" data-vista="produtos" aria-current="true">Produtos</button>
+        <button type="button" class="nav-item" data-vista="categorias">Categorias</button>
+        <button type="button" class="nav-item" data-vista="configuracoes">Loja</button>
+        <button type="button" class="nav-item" data-vista="historico">Histórico</button>
+        <button type="button" class="nav-item" data-vista="qrcode">QR Code</button>
+      </nav>
+      <div class="sidebar__rodape">
+        <button type="button" class="btn btn--secundario btn--bloco" id="btn-sair">
+          <svg class="icone" aria-hidden="true"><use href="#i-sair"/></svg> Sair
+        </button>
+      </div>
+    </aside>
+
+    <main class="admin-conteudo">
+      <!-- Visão: Produtos -->
+      <section id="vista-produtos" class="vista-conteudo" aria-label="Gerenciar Produtos">
+        <div class="vista-header">
+          <h2 class="t-heading-sm">Produtos do Cardápio</h2>
+          <button class="btn btn--primario" id="btn-novo-produto">+ Novo Produto</button>
+        </div>
+        <div class="tabela-container">
+          <table class="tabela" id="tabela-produtos">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nome / Categoria</th>
+                <th style="width: 120px;">Preço</th>
+                <th style="width: 100px; text-align: center;">Disponível<br><small>(Estoque)</small></th>
+                <th style="width: 100px; text-align: center;">Ativo<br><small>(Visível)</small></th>
+                <th style="width: 80px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="lista-produtos"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Visão: Categorias -->
+      <section id="vista-categorias" class="vista-conteudo" aria-label="Gerenciar Categorias" hidden>
+        <div class="vista-header">
+          <h2 class="t-heading-sm">Categorias</h2>
+          <button class="btn btn--primario" id="btn-nova-categoria">+ Nova Categoria</button>
+        </div>
+        <div class="tabela-container">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th style="width: 120px;">Ordem</th>
+                <th style="width: 140px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="lista-categorias"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Visão: Configurações -->
+      <section id="vista-configuracoes" class="vista-conteudo" aria-label="Configurações da Loja" hidden>
+        <h2 class="t-heading-sm">Configurações da Loja</h2>
+        <form id="form-loja" class="card-form" style="max-width: 600px; margin-top: var(--space-6);">
+          <div class="campo">
+            <label class="campo__rotulo" for="loja-nome-input">Nome do Restaurante</label>
+            <input type="text" id="loja-nome-input" class="campo__entrada" required>
+          </div>
+          <div class="campo">
+            <label class="campo__rotulo" for="loja-slug">Slug (URL)</label>
+            <input type="text" id="loja-slug" class="campo__entrada" pattern="^[a-z0-9]+(-[a-z0-9]+)*$" required>
+            <p class="campo__ajuda">Atenção: alterar o slug fará com que QR Codes antigos parem de funcionar!</p>
+          </div>
+          <div class="campo">
+            <label class="campo__rotulo" for="loja-endereco">Endereço Público</label>
+            <textarea id="loja-endereco" class="campo__entrada" rows="3"></textarea>
+          </div>
+          <div class="campo" style="display: flex; align-items: center; gap: var(--space-4);">
+            <label class="toggle" for="loja-ativa">
+              <input type="checkbox" id="loja-ativa" class="toggle__input sr-only" role="switch">
+              <span class="toggle__trilho"></span>
+            </label>
+            <div>
+              <strong>Loja Aberta</strong>
+              <p class="campo__ajuda" style="margin:0;">Se desativada, clientes não poderão ver o cardápio.</p>
+            </div>
+          </div>
+          <div style="margin-top: var(--space-8);">
+            <button type="submit" class="btn btn--primario" id="btn-salvar-loja">Salvar Alterações</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Visão: Histórico (Leitura Paginada) -->
+      <section id="vista-historico" class="vista-conteudo" aria-label="Histórico de Pedidos" hidden>
+        <div class="vista-header">
+          <h2 class="t-heading-sm">Histórico de Pedidos</h2>
+          <div style="display: flex; gap: var(--space-4);">
+            <input type="date" id="filtro-data" class="campo__entrada" style="height: 40px;">
+            <select id="filtro-status" class="campo__entrada" style="height: 40px;">
+              <option value="">Todos</option>
+              <option value="finalizado">Finalizados</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </div>
+        </div>
+        <div class="tabela-container">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>Data / Hora</th>
+                <th>Número</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Itens</th>
+              </tr>
+            </thead>
+            <tbody id="lista-historico"></tbody>
+          </table>
+          <div class="paginacao" id="paginacao-historico">
+            <button class="btn btn--secundario btn-sm" id="btn-ant">Anterior</button>
+            <span id="txt-paginacao" style="margin: 0 var(--space-4);">Página 1</span>
+            <button class="btn btn--secundario btn-sm" id="btn-prox">Próxima</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Visão: QR Code -->
+      <section id="vista-qrcode" class="vista-conteudo" aria-label="QR Code da Loja" hidden>
+        <h2 class="t-heading-sm">QR Code do Cardápio</h2>
+        <div class="card-qrcode">
+          <div id="qrcode-container"></div>
+          <p class="link-loja" id="link-loja"></p>
+          <div class="acoes-qrcode">
+            <button class="btn btn--primario" id="btn-baixar-qr">Baixar PNG</button>
+            <button class="btn btn--secundario" id="btn-imprimir-qr">Imprimir</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Produto -->
+  <dialog class="modal" id="modal-produto">
+    <div class="modal__conteudo">
+      <header class="modal__cabecalho">
+        <h2 class="t-heading-sm" id="modal-produto-titulo">Produto</h2>
+        <button class="btn-fechar" id="fechar-produto" aria-label="Fechar"><svg class="icone"><use href="#i-x"/></svg></button>
+      </header>
+      <form id="form-produto" class="modal__form">
+        <input type="hidden" id="prod-id">
+        <div class="campo">
+          <label class="campo__rotulo" for="prod-nome">Nome do Produto</label>
+          <input type="text" id="prod-nome" class="campo__entrada" required>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="prod-cat">Categoria</label>
+          <select id="prod-cat" class="campo__entrada" required></select>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="prod-preco">Preço (R$)</label>
+          <input type="number" id="prod-preco" class="campo__entrada" step="0.01" min="0" required>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="prod-desc">Descrição</label>
+          <textarea id="prod-desc" class="campo__entrada" rows="3"></textarea>
+        </div>
+        
+        <div class="campo">
+          <label class="campo__rotulo">Foto do Produto (opcional)</label>
+          <div class="upload-area">
+            <img id="prod-preview" src="" alt="" style="display: none; width: 96px; height: 96px; object-fit: cover; border-radius: var(--radius-badge);">
+            <input type="file" id="prod-foto" accept="image/*">
+            <p class="campo__ajuda">A imagem será convertida e otimizada automaticamente.</p>
+          </div>
+        </div>
+        <footer class="modal__rodape">
+          <button type="submit" class="btn btn--primario btn--bloco" id="btn-salvar-produto">Salvar Produto</button>
+        </footer>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal Categoria -->
+  <dialog class="modal" id="modal-categoria">
+    <div class="modal__conteudo" style="max-width: 400px;">
+      <header class="modal__cabecalho">
+        <h2 class="t-heading-sm" id="modal-categoria-titulo">Categoria</h2>
+        <button class="btn-fechar" id="fechar-categoria" aria-label="Fechar"><svg class="icone"><use href="#i-x"/></svg></button>
+      </header>
+      <form id="form-categoria" class="modal__form">
+        <input type="hidden" id="cat-id">
+        <div class="campo">
+          <label class="campo__rotulo" for="cat-nome">Nome da Categoria</label>
+          <input type="text" id="cat-nome" class="campo__entrada" required>
+        </div>
+        <footer class="modal__rodape">
+          <button type="submit" class="btn btn--primario btn--bloco" id="btn-salvar-categoria">Salvar</button>
+        </footer>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Toasts -->
+  <div class="toasts" id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

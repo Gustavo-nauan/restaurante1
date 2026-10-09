@@ -5,5 +5,5 @@ Thumbs.db
 .idea/
 
 # Temp assets / generated files
-web/qrcode.jpg
+# web/qrcode.jpg
 *.log
