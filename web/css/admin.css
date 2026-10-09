@@ -258,3 +258,39 @@
     overflow-x: auto;
   }
 }
+
+/* Responsividade de Tabelas */
+.tabela-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: var(--space-4);
+  background: var(--color-prato);
+  border-radius: var(--radius-sheet);
+  border: 1px solid var(--color-linha);
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 600px;
+}
+
+.tabela th, .tabela td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-linha);
+  vertical-align: middle;
+}
+
+.tabela th {
+  background-color: var(--color-areia);
+  font-weight: 600;
+  color: var(--color-carvao);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.tabela tr:last-child td {
+  border-bottom: none;
+}

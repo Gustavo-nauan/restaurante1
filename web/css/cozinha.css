@@ -64,9 +64,9 @@ body { min-height: 100vh; min-height: 100dvh; }
 /* ---------- Visões (Pedidos / Histórico) e abas de status ---------- */
 .visoes { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4); }
 .visao {
-  min-height: var(--target-cliente); padding: 0 var(--space-5); border: 0; border-radius: var(--radius-pill);
+  min-height: 48px; padding: 0 var(--space-6); border: 0; border-radius: var(--radius-pill);
   background: var(--color-areia); color: var(--color-carvao);
-  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  font-size: var(--text-sm); font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
   transition: background-color var(--motion-fast), color var(--motion-fast);
 }
 .visao[aria-current="true"] { background: var(--color-brasa); color: var(--color-branco); }

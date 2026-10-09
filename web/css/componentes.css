@@ -477,7 +477,7 @@
   transition: opacity var(--motion-sheet), visibility var(--motion-sheet);
 }
 
-.modal-overlay.aberto {
+.modal-overlay.aberta {
   opacity: 1;
   visibility: visible;
 }
@@ -497,7 +497,8 @@
   overflow: hidden;
 }
 
-.modal-overlay.aberto .folha-carrinho {
+.modal-overlay.aberta .folha-carrinho,
+.folha-carrinho.aberta {
   transform: translateY(0);
 }
 
