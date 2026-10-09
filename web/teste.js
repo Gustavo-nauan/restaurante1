@@ -290,11 +290,8 @@ function atualizarTudo(id, acaoFoco) {
   renderizarCarrinho();
 
   if (emFolha) {
-    if (!carrinhoLocal.length) { fecharCarrinho(); return; }
     const alvo = acharBotao($('carrinho-itens'), acaoFoco, id) || acharBotao($('carrinho-itens'), 'mais', id) || $('btn-fechar-carrinho');
     (alvo && !alvo.disabled ? alvo : $('btn-fechar-carrinho')).focus();
-  } else if (folhaAberta && !carrinhoLocal.length) {
-    fecharCarrinho();
   }
 }
 
@@ -309,34 +306,44 @@ function renderizarCarrinho() {
   const total = totalCarrinho();
   const qtdItens = carrinhoLocal.reduce((t, i) => t + i.qtd, 0);
 
-  $('carrinho-itens').innerHTML = carrinhoLocal
-    .map((i, idx) => {
-      const p = produtosPorId.get(i.id_produto);
-      if (!p) return '';
-      const mostrarContador = i.obs.length >= AVISO_OBS;
-      return `
-        <li class="item-carrinho">
-          <div class="item-carrinho__linha">
-            <span class="item-carrinho__nome t-strong">${esc(p.nome)}</span>
-            <span class="item-carrinho__subtotal">${moeda(Number(p.preco) * i.qtd)}</span>
-          </div>
-          <div class="item-carrinho__linha">
-            ${htmlSeletor(p, i)}
-          </div>
-          <div class="campo">
-            <label class="campo__rotulo" for="obs-${idx}">Observação</label>
-            <input class="campo__entrada" id="obs-${idx}" data-acao="obs" data-id="${esc(i.id_produto)}" value="${esc(i.obs)}"
-                   placeholder="Ex.: sem cebola" maxlength="${LIMITE_OBS}" autocomplete="off">
-            <span class="campo__contador${i.obs.length >= LIMITE_OBS ? ' campo__contador--limite' : ''}" data-contador ${mostrarContador ? '' : 'hidden'}>${i.obs.length}/${LIMITE_OBS}</span>
-          </div>
-        </li>`;
-    })
-    .join('');
+  if (carrinhoLocal.length === 0) {
+    $('carrinho-itens').innerHTML = `
+      <div class="estado estado--vazio" style="padding: var(--space-8) 0; text-align: center;">
+        <div style="color: var(--color-fumaca); margin-bottom: var(--space-4);">
+          ${icone('sacola', 'icone--24')}
+        </div>
+        <p class="t-strong" style="color: var(--color-fumaca); margin-bottom: var(--space-2);">Seu carrinho está vazio</p>
+        <p style="color: var(--color-fumaca); font-size: var(--text-sm);">Adicione itens do cardápio para continuar</p>
+      </div>`;
+  } else {
+    $('carrinho-itens').innerHTML = carrinhoLocal
+      .map((i, idx) => {
+        const p = produtosPorId.get(i.id_produto);
+        if (!p) return '';
+        const mostrarContador = i.obs.length >= AVISO_OBS;
+        return `
+          <li class="item-carrinho">
+            <div class="item-carrinho__linha">
+              <span class="item-carrinho__nome t-strong">${esc(p.nome)}</span>
+              <span class="item-carrinho__subtotal">${moeda(Number(p.preco) * i.qtd)}</span>
+            </div>
+            <div class="item-carrinho__linha">
+              ${htmlSeletor(p, i)}
+            </div>
+            <div class="campo">
+              <label class="campo__rotulo" for="obs-${idx}">Observação</label>
+              <input class="campo__entrada" id="obs-${idx}" data-acao="obs" data-id="${esc(i.id_produto)}" value="${esc(i.obs)}"
+                     placeholder="Ex.: sem cebola" maxlength="${LIMITE_OBS}" autocomplete="off">
+              <span class="campo__contador${i.obs.length >= LIMITE_OBS ? ' campo__contador--limite' : ''}" data-contador ${mostrarContador ? '' : 'hidden'}>${i.obs.length}/${LIMITE_OBS}</span>
+            </div>
+          </li>`;
+      })
+      .join('');
+  }
 
   $('carrinho-total').textContent = moeda(total);
   $('barra-total').textContent = moeda(total);
   $('barra-itens').textContent = `Ver carrinho · ${qtdItens} ${qtdItens === 1 ? 'item' : 'itens'}`;
-  $('barra-carrinho').hidden = carrinhoLocal.length === 0;
   const btn = $('btn-finalizar');
   btn.disabled = carrinhoLocal.length === 0 || enviando;
 }
@@ -346,7 +353,6 @@ const REGIOES_DE_FUNDO = ['loja', 'abas', 'conteudo', 'barra-carrinho'];
 let focoAnterior = null;
 
 function abrirCarrinho() {
-  if (!carrinhoLocal.length) return;
   focoAnterior = document.activeElement;
   REGIOES_DE_FUNDO.forEach((id) => $(id).setAttribute('inert', ''));
   $('overlay').classList.add('aberta');

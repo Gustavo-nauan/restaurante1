@@ -58,3 +58,20 @@ h1, h2, h3, .font-display {
   display: flex;
   flex-direction: column;
 }
+
+/* Ícones */
+.icone, .icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: inline-block;
+  vertical-align: middle;
+}
+.icone--24, .icon-lg {
+  width: 24px;
+  height: 24px;
+}

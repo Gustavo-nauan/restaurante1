@@ -5,6 +5,41 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
+   0. Formulários e Campos
+   -------------------------------------------------------------------------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  width: 100%;
+}
+.campo__rotulo {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-fumaca);
+}
+.campo__entrada {
+  background-color: var(--color-prato);
+  border: 1px solid var(--color-linha);
+  color: var(--color-carvao);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--text-body);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.campo__entrada:focus {
+  outline: none;
+  border-color: var(--color-carvao);
+  box-shadow: 0 0 0 1px var(--color-carvao);
+}
+.campo__entrada::placeholder {
+  color: var(--color-fumaca);
+}
+
+/* --------------------------------------------------------------------------
    1. Cabeçalho da Loja (Compartilhado: Cardápio e Pedido)
    -------------------------------------------------------------------------- */
 .header-loja {
