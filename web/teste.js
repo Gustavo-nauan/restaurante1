@@ -423,20 +423,10 @@ async function finalizarPedido(restauranteId) {
     return;
   }
 
-  mostrarToast(`Pedido #${resultado.numero} enviado para a cozinha!`);
-  const ids = carrinhoLocal.map((i) => i.id_produto);
   carrinhoLocal = [];
-  fecharCarrinho();
-  ids.forEach((id) => {
-    const cartao = [...$('cardapio-container').querySelectorAll('.produto')].find((e) => e.dataset.produtoId === id);
-    const p = produtosPorId.get(id);
-    if (cartao && p) {
-      const tpl = document.createElement('template');
-      tpl.innerHTML = htmlCartao(p, true).trim();
-      cartao.replaceWith(tpl.content.firstElementChild);
-    }
-  });
-  renderizarCarrinho();
+  localStorage.removeItem('carrinho');
+  localStorage.setItem('pedidoId', resultado.id);
+  window.location.href = 'pedido.html';
 }
 
 // ---------- Inicialização ----------

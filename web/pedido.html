@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Acompanhar Pedido</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/pedido.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.33.1/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div id="toast-container"></div>
+  
+  <div class="tela-pedido" id="app">
+    <!-- Skeleton Loading Inicial -->
+    <div id="loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50vh;">
+      <div class="skeleton-box" style="width: 100px; height: 20px; margin-bottom: 8px;"></div>
+      <div class="skeleton-box" style="width: 120px; height: 96px; margin-bottom: 32px;"></div>
+      <div class="skeleton-box" style="width: 250px; height: 32px;"></div>
+    </div>
+
+    <div id="conteudo" style="display: none;">
+      <div class="pedido-header">
+        <div class="pedido-label" id="loja-nome">Restaurante</div>
+        <div class="pedido-label">Seu pedido</div>
+        <h1 class="pedido-numero" id="pedido-numero">#--</h1>
+      </div>
+
+      <div class="pedido-mensagem" id="pedido-mensagem">
+        Carregando...
+      </div>
+
+      <div class="timeline" id="timeline">
+        <div class="etapa" data-step="recebido">
+          <div class="etapa-circulo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="etapa-texto">Pedido enviado</div>
+        </div>
+        <div class="etapa" data-step="confirmado">
+          <div class="etapa-circulo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="etapa-texto">Aceito pela cozinha</div>
+        </div>
+        <div class="etapa" data-step="em_preparo">
+          <div class="etapa-circulo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="etapa-texto">Em preparo</div>
+        </div>
+        <div class="etapa" data-step="pronto">
+          <div class="etapa-circulo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="etapa-texto">Pronto</div>
+        </div>
+      </div>
+
+      <div class="pedido-itens" id="pedido-itens-container">
+        <h3>Resumo do Pedido</h3>
+        <div id="lista-itens"></div>
+      </div>
+      
+      <div style="margin-top: var(--space-8); text-align: center;">
+        <button id="btn-novo" class="btn-primario" style="display: none; width: 100%;">Fazer novo pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="supabase-client.js"></script>
+  <script src="pedido.js"></script>
+</body>
+</html>

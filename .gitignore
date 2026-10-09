@@ -1,0 +1,9 @@
+# OS & Editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temp assets / generated files
+web/qrcode.jpg
+*.log

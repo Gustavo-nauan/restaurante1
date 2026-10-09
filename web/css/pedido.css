@@ -1,0 +1,192 @@
+.tela-pedido {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  min-height: 100vh;
+  transition: background-color var(--motion-fast);
+}
+
+.pedido-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.pedido-label {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  color: var(--color-fumaca);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.pedido-numero {
+  font-family: var(--font-display);
+  font-size: var(--text-numero-pedido);
+  font-weight: 700;
+  color: var(--color-carvao);
+  line-height: 1;
+  margin: 0;
+}
+
+.pedido-mensagem {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-heading-sm);
+  font-weight: 600;
+  color: var(--color-carvao);
+  margin-bottom: var(--space-8);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin-left: var(--space-4);
+  position: relative;
+}
+
+/* Linha conectora de fundo */
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 11px; /* Centro do círculo de 24px: 24/2 = 12. Linha de 2px, left = 12 - 1 = 11 */
+  width: 2px;
+  background-color: var(--color-linha);
+  z-index: 0;
+}
+
+.etapa {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  position: relative;
+  z-index: 1;
+}
+
+.etapa-circulo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--color-linha);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-prato);
+  flex-shrink: 0;
+  transition: all var(--motion-fast);
+}
+
+.etapa-circulo svg {
+  width: 14px;
+  height: 14px;
+  display: none;
+}
+
+.etapa-texto {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  color: var(--color-fumaca);
+  transition: all var(--motion-fast);
+}
+
+/* Estados da etapa */
+.etapa.concluida .etapa-circulo {
+  background-color: var(--status-pronto);
+}
+
+.etapa.concluida .etapa-circulo svg {
+  display: block;
+}
+
+.etapa.concluida .etapa-texto {
+  color: var(--color-carvao);
+}
+
+.etapa.atual .etapa-circulo {
+  background-color: var(--status-preparo);
+  box-shadow: 0 0 0 2px var(--color-papel), 0 0 0 5px var(--status-preparo);
+}
+
+.etapa.atual .etapa-texto {
+  font-weight: 600;
+  color: var(--color-carvao);
+}
+
+/* Estados da tela inteira */
+body.tema-pronto {
+  background-color: var(--status-pronto-bg);
+}
+
+body.tema-cancelado {
+  background-color: var(--status-cancelado-bg);
+}
+
+/* Esconder timeline quando cancelado ou mudar layout, se necessário */
+body.tema-cancelado .timeline {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pedido-itens {
+  margin-top: var(--space-10);
+  background: var(--color-prato);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-flutuante);
+}
+
+.pedido-itens h3 {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-strong);
+  margin-bottom: var(--space-3);
+  margin-top: 0;
+}
+
+.item-linha {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-linha);
+  font-family: var(--font-ui);
+  font-size: var(--text-body-sm);
+  color: var(--color-carvao);
+}
+
+.item-linha:last-child {
+  border-bottom: none;
+}
+
+.item-qtd-nome {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.item-qtd {
+  font-weight: 600;
+}
+
+.item-obs {
+  font-size: var(--text-caption);
+  color: var(--color-fumaca);
+  margin-top: var(--space-1);
+}
+
+/* Skeleton de carregamento */
+.skeleton-box {
+  background: var(--color-areia);
+  border-radius: var(--radius-badge);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-box { animation: none; }
+}

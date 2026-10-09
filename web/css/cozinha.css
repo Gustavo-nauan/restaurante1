@@ -1,0 +1,213 @@
+/* Painel da cozinha (tema escuro via data-tema="cozinha"). Nenhuma cor, fonte ou sombra fora dos tokens. */
+
+[hidden] { display: none !important; }
+[data-tema="cozinha"] { color-scheme: dark; }
+body { min-height: 100vh; min-height: 100dvh; }
+
+/* Cor de cada status: os elementos com data-status herdam --cor e --cor-bg */
+[data-status="recebido"]   { --cor: var(--status-recebido);   --cor-bg: var(--status-recebido-bg); }
+[data-status="confirmado"] { --cor: var(--status-confirmado); --cor-bg: var(--status-confirmado-bg); }
+[data-status="em_preparo"] { --cor: var(--status-preparo);    --cor-bg: var(--status-preparo-bg); }
+[data-status="pronto"]     { --cor: var(--status-pronto);     --cor-bg: var(--status-pronto-bg); }
+[data-status="finalizado"] { --cor: var(--status-finalizado); --cor-bg: var(--status-finalizado-bg); }
+[data-status="cancelado"]  { --cor: var(--status-cancelado);  --cor-bg: var(--status-cancelado-bg); }
+
+/* ---------- Login ---------- */
+.login { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-6) var(--space-4); }
+.login__cartao {
+  width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: var(--space-6);
+  padding: var(--space-8) var(--space-6); background: var(--color-prato);
+  border: 1px solid var(--color-linha); border-radius: var(--radius-card);
+}
+.login__marca { display: flex; align-items: center; gap: var(--space-3); }
+.login__logo {
+  width: var(--target-cliente); height: var(--target-cliente); border-radius: var(--radius-pill); flex: none;
+  background: var(--color-areia); display: flex; align-items: center; justify-content: center;
+}
+.login__form { display: flex; flex-direction: column; gap: var(--space-4); }
+.login__erro {
+  display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3);
+  border-radius: var(--radius-control); background: var(--status-recebido-bg); color: var(--status-recebido);
+  font-size: var(--text-body-sm); font-weight: 600;
+}
+.login__erro span { color: var(--color-carvao); }
+.campo__entrada[aria-invalid="true"] { border-color: var(--status-recebido); }
+
+/* ---------- Cabeçalho da cozinha ---------- */
+.cabecalho {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  padding-left: max(var(--space-4), env(safe-area-inset-left)); padding-right: max(var(--space-4), env(safe-area-inset-right));
+  background: var(--color-areia); border-bottom: 1px solid var(--color-linha);
+}
+.cabecalho__loja { min-width: 0; }
+.cabecalho__nome { overflow-wrap: anywhere; }
+.cabecalho__acoes { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: var(--space-3); }
+
+.conexao {
+  display: inline-flex; align-items: center; gap: var(--space-2); color: var(--status-pronto);
+  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.conexao__ponto { width: 12px; height: 12px; border-radius: var(--radius-pill); background: currentColor; flex: none; }
+.conexao--offline { color: var(--status-confirmado); }
+
+.btn-cab {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-cliente); padding: 0 var(--space-4);
+  border: 1px solid var(--color-linha); border-radius: var(--radius-control); background: transparent; color: var(--color-carvao);
+  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+.btn-cab:hover { background: var(--color-prato); }
+.btn-cab--destaque { border-color: var(--color-brasa); }
+
+/* ---------- Visões (Pedidos / Histórico) e abas de status ---------- */
+.visoes { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4); }
+.visao {
+  min-height: var(--target-cliente); padding: 0 var(--space-5); border: 0; border-radius: var(--radius-pill);
+  background: var(--color-areia); color: var(--color-carvao);
+  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+.visao[aria-current="true"] { background: var(--color-brasa); color: var(--color-branco); }
+
+.abas-status { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); padding: 0 var(--space-4) var(--space-3); }
+.aba-status {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1);
+  min-height: var(--target-cozinha); padding: var(--space-1) var(--space-1) 0;
+  border: 0; border-bottom: 4px solid var(--cor); border-radius: var(--radius-control);
+  background: var(--color-areia); color: var(--color-carvao);
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+.aba-status__rotulo { font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.aba-status__cont { font-family: var(--font-display); font-size: var(--text-heading-sm); font-weight: 700; line-height: 1; }
+.aba-status[aria-current="true"] { background: var(--color-brasa); color: var(--color-branco); }
+
+/* ---------- Aviso de erro de carga ---------- */
+.aviso {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+  margin: 0 var(--space-4) var(--space-4); padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control); border-left: 4px solid var(--status-recebido); background: var(--status-recebido-bg);
+}
+.aviso__texto { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-body-sm); font-weight: 600; }
+.aviso__texto .icone { color: var(--status-recebido); }
+
+/* ---------- Colunas por status ---------- */
+.colunas { padding: 0 var(--space-4) var(--space-8); }
+.coluna { display: none; flex-direction: column; gap: var(--space-4); }
+.coluna--ativa { display: flex; }
+.coluna__topo { display: none; }
+.coluna__lista { display: flex; flex-direction: column; gap: var(--space-4); }
+.coluna__lista:empty::before {
+  content: "Nenhum pedido"; display: block; padding: var(--space-8) var(--space-4); text-align: center;
+  color: var(--color-fumaca); border: 1px dashed var(--color-linha); border-radius: var(--radius-card);
+}
+
+@media (min-width: 1100px) {
+  .abas-status { display: none; }
+  .colunas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); align-items: start; }
+  .coluna { display: flex; }
+  .coluna__topo {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4); background: var(--color-areia);
+    border-bottom: 4px solid var(--cor); border-radius: var(--radius-control);
+  }
+}
+.coluna__contador {
+  min-width: 48px; padding: 0 var(--space-3); text-align: center; border-radius: var(--radius-pill);
+  background: var(--cor-bg); color: var(--cor);
+  font-family: var(--font-display); font-size: var(--text-heading-sm); font-weight: 700; line-height: 1.4;
+}
+
+/* ---------- Cartão de pedido ---------- */
+.pedido {
+  display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5);
+  background: var(--color-prato); border: 1px solid var(--color-linha); border-left: 8px solid var(--cor);
+  border-radius: var(--radius-card); outline: 4px solid transparent; outline-offset: -4px;
+}
+.pedido__topo { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.pedido__numero { font-family: var(--font-display); font-size: var(--text-cozinha-numero); font-weight: 700; line-height: 1; }
+.pedido__dia { display: block; margin-top: var(--space-1); font-size: var(--text-body-sm); color: var(--color-fumaca); }
+.pedido__meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-4);
+  font-size: var(--text-cozinha-item); font-weight: 600; line-height: 1.3; color: var(--color-fumaca);
+}
+.pedido__tempo { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-carvao); font-weight: 700; }
+.pedido__tempo.tempo--atencao { color: var(--status-confirmado); }
+.pedido__tempo.tempo--critico { color: var(--status-recebido); }
+
+.pedido__itens { display: flex; flex-direction: column; gap: var(--space-3); }
+.pedido__item { display: flex; flex-direction: column; gap: var(--space-2); }
+.pedido__item-linha { font-size: var(--text-cozinha-item); font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.pedido__qtd { font-weight: 700; }
+
+/* Observação do cliente: sempre integral e em destaque */
+.obs {
+  display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3);
+  border-left: 4px solid var(--status-confirmado); border-radius: var(--radius-control); background: var(--status-confirmado-bg);
+}
+.obs .icone { color: var(--status-confirmado); margin-top: 2px; }
+.obs__corpo { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.obs__rotulo { font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--status-confirmado); }
+.obs__texto { font-size: var(--text-cozinha-item); font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; white-space: pre-wrap; }
+
+.pedido__rodape { display: flex; flex-direction: column; gap: var(--space-3); margin-top: auto; }
+.pedido__total { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--text-cozinha-item); font-weight: 700; }
+
+.btn-cozinha {
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  min-height: var(--target-cozinha); padding: 0 var(--space-5);
+  border: 1px solid transparent; border-radius: var(--radius-control);
+  background: var(--color-brasa); color: var(--color-branco);
+  font-size: var(--text-cozinha-botao); font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+.btn-cozinha:hover, .btn-cozinha:active { background: var(--color-brasa-escura); }
+.btn-cozinha:disabled { background: var(--color-areia); color: var(--color-fumaca); cursor: default; }
+.btn-cozinha--perigo {
+  min-height: var(--target-cliente); background: transparent; border-color: var(--status-recebido); color: var(--status-recebido);
+  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em;
+}
+.btn-cozinha--perigo:hover, .btn-cozinha--perigo:active { background: var(--status-recebido-bg); }
+.btn-cozinha--perigo:disabled { background: transparent; border-color: var(--color-linha); color: var(--color-fumaca); }
+.btn-cozinha--secundario { background: transparent; border-color: var(--color-carvao); color: var(--color-carvao); }
+.btn-cozinha--secundario:hover, .btn-cozinha--secundario:active { background: var(--color-areia); }
+
+/* Selo de status (cor + texto + ponto) */
+.badge-status {
+  display: inline-flex; align-items: center; gap: var(--space-2); height: 32px; padding: 0 var(--space-3);
+  border-radius: var(--radius-badge); background: var(--cor-bg); color: var(--cor);
+  font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.badge-status::before { content: ""; width: 8px; height: 8px; border-radius: var(--radius-pill); background: currentColor; }
+[data-status="cancelado"] .badge-status,
+[data-status="cancelado"] .pedido__numero { text-decoration: line-through; }
+
+/* Pedido novo: destaque pulsante duas vezes */
+@keyframes pulsar { 0%, 100% { outline-color: transparent; } 50% { outline-color: var(--cor); } }
+.pedido--novo { animation: pulsar 1s ease-in-out 2; }
+@media (prefers-reduced-motion: reduce) {
+  .pedido--novo { animation: none; outline-color: var(--cor); }
+}
+
+/* ---------- Histórico do dia ---------- */
+.historico { display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4) var(--space-8); }
+.resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3); }
+.resumo__item {
+  display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4);
+  background: var(--color-prato); border: 1px solid var(--color-linha); border-radius: var(--radius-card);
+}
+.resumo__rotulo { font-size: var(--text-label); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--color-fumaca); }
+.resumo__valor { font-family: var(--font-display); font-size: var(--text-heading); font-weight: 700; line-height: 1.05; }
+.historico__nota { font-size: var(--text-body-sm); color: var(--color-fumaca); }
+.historico__lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-4); align-items: start; }
+
+/* ---------- Diálogo de confirmação ---------- */
+.dialogo {
+  width: min(92vw, 420px); padding: var(--space-6);
+  border: 1px solid var(--color-linha); border-radius: var(--radius-card);
+  background: var(--color-prato); color: var(--color-carvao);
+}
+.dialogo::backdrop { background: var(--overlay); }
+.dialogo__texto { margin-top: var(--space-2); color: var(--color-fumaca); }
+.dialogo__acoes { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6); }
