@@ -4,19 +4,296 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Cardápio</title>
-  <meta name="description" content="Faça seu pedido pelo celular e acompanhe o preparo direto da cozinha.">
-  <meta name="theme-color" content="#FFF8F0">
-
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/componentes.css">
+
+  <style>
+    /* Estilos para mapear as classes geradas dinamicamente pelo teste.js aos tokens/componentes */
+    
+    /* Abas */
+    .aba {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    .aba .chip {
+      height: 40px;
+      min-height: 40px;
+      padding: 0 var(--space-4);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-size: var(--text-label);
+      font-weight: 600;
+      text-transform: uppercase;
+      white-space: nowrap;
+      background-color: var(--color-prato);
+      border: 1px solid var(--color-linha);
+      color: var(--color-carvao);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
+    }
+    .aba[aria-current="true"] .chip {
+      background-color: var(--color-brasa);
+      border-color: var(--color-brasa);
+      color: #FFFFFF;
+    }
+    .categorias-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: var(--color-papel);
+      padding: var(--space-2) 0;
+      margin-bottom: var(--space-5);
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      border-bottom: 1px solid var(--color-linha);
+    }
+    .categorias-nav::-webkit-scrollbar { display: none; }
+
+    /* Produtos */
+    .secao {
+      margin-bottom: var(--space-8);
+    }
+    .secao__titulo {
+      font-family: var(--font-display);
+      font-size: var(--text-heading-sm);
+      text-transform: uppercase;
+      color: var(--color-carvao);
+      margin-bottom: var(--space-3);
+    }
+    .lista-produtos {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .produto {
+      background-color: var(--color-prato);
+      border: 1px solid var(--color-linha);
+      border-radius: var(--radius-card);
+      padding: var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      position: relative;
+    }
+    .produto--no-carrinho {
+      border-color: var(--color-brasa);
+      background-color: var(--color-brasa-suave);
+    }
+    .produto--esgotado {
+      opacity: 0.8;
+      background-color: var(--color-papel);
+    }
+    .produto__texto {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .produto__nome {
+      font-size: var(--text-body-strong);
+      font-weight: 600;
+      color: var(--color-carvao);
+      margin-bottom: var(--space-1);
+    }
+    .produto__desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-fumaca);
+      line-height: 1.4;
+      margin-bottom: var(--space-2);
+    }
+    .produto__preco {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: var(--text-body);
+      color: var(--color-carvao);
+      margin-top: auto;
+    }
+    .produto__midia {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+    }
+    .produto__foto, .produto__placeholder {
+      width: 96px;
+      height: 96px;
+      border-radius: var(--radius-control);
+      object-fit: cover;
+      background-color: var(--color-areia);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .produto--esgotado .produto__foto {
+      filter: grayscale(100%);
+      opacity: 0.5;
+    }
+    .produto__add {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-pill);
+      background-color: var(--color-brasa);
+      color: #FFFFFF;
+      border: 2px solid var(--color-prato);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-nivel-1);
+    }
+    .produto--esgotado .produto__add { display: none; }
+    
+    .produto__acao {
+      position: absolute;
+      bottom: var(--space-4);
+      right: var(--space-4);
+    }
+    .qtd {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background-color: var(--color-prato);
+      border: 1px solid var(--color-linha);
+      border-radius: var(--radius-control);
+      padding: 2px 4px;
+    }
+    .qtd button {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-badge);
+      border: 1px solid var(--color-linha);
+      background-color: var(--color-papel);
+      color: var(--color-carvao);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .qtd .qtd__valor {
+      font-weight: 700;
+      font-size: var(--text-body);
+      min-width: 24px;
+      text-align: center;
+    }
+    .badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--color-areia);
+      color: var(--color-fumaca);
+      font-family: var(--font-display);
+      font-size: var(--text-caption);
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-badge);
+      z-index: 2;
+    }
+
+    /* Itens do Carrinho */
+    .item-carrinho {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-linha);
+    }
+    .item-carrinho__linha {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item-carrinho__nome {
+      font-weight: 600;
+      color: var(--color-carvao);
+    }
+    .item-carrinho__subtotal {
+      font-size: var(--text-body-sm);
+      color: var(--color-fumaca);
+    }
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .campo__rotulo {
+      font-size: var(--text-label);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .campo__entrada {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--color-linha);
+      border-radius: var(--radius-control);
+      font-family: var(--font-ui);
+      font-size: var(--text-body);
+      background-color: var(--color-papel);
+    }
+    .campo__contador {
+      font-size: var(--text-caption);
+      color: var(--color-fumaca);
+      text-align: right;
+    }
+    .campo__contador--limite {
+      color: var(--status-recebido);
+    }
+
+    /* Utilitários gerados pelo JS */
+    .estado {
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+    }
+    .estado__titulo {
+      font-size: var(--text-subheading);
+      margin: var(--space-3) 0;
+    }
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-carvao);
+      color: #fff;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-control);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      z-index: 1000;
+    }
+    .toast--erro {
+      background: var(--status-recebido);
+    }
+    .btn--secundario {
+      background: var(--color-prato);
+      border: 1px solid var(--color-linha);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-control);
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <!-- Ícones SVG inline (traço de 2px, pontas arredondadas, cor herdada) -->
+  <!-- Ícones SVG inline originais do projeto -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <symbol id="i-talheres" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M6 2v20"/><path d="M20 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
     <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
@@ -27,70 +304,63 @@
     <symbol id="i-sacola" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
   </svg>
 
-  <a class="skip-link" href="#conteudo">Pular para o cardápio</a>
-
-  <header class="container loja" id="loja">
-    <div class="loja__logo" id="loja-logo" aria-hidden="true"></div>
-    <div class="loja__texto">
-      <h1 class="t-heading loja__nome" id="titulo">Cardápio</h1>
-      <p class="t-body-sm t-muted" id="loja-endereco" hidden></p>
-    </div>
-  </header>
-
-  <nav class="abas" id="abas" aria-label="Categorias do cardápio">
-    <div class="container">
-      <div class="abas__lista" id="abas-lista">
-        <span class="skeleton skeleton--aba"></span>
-        <span class="skeleton skeleton--aba"></span>
-        <span class="skeleton skeleton--aba"></span>
+  <div class="app-container">
+    
+    <header class="header-loja" id="loja">
+      <div class="loja-identidade">
+        <div class="loja-avatar" id="loja-logo" aria-hidden="true"></div>
+        <div class="loja-dados">
+          <h1 id="titulo" class="t-heading loja__nome">Cardápio</h1>
+          <p id="loja-endereco" hidden></p>
+        </div>
       </div>
-    </div>
-  </nav>
+    </header>
 
-  <main class="container com-barra" id="conteudo" tabindex="-1" aria-busy="true">
-    <div id="cardapio-container">
-      <div class="lista-produtos" aria-hidden="true" style="padding-top: var(--space-6)">
-        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
-        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
-        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
-      </div>
-      <p class="sr-only">Carregando cardápio…</p>
-    </div>
-  </main>
+    <nav id="abas" aria-label="Categorias do cardápio">
+      <div id="abas-lista" class="categorias-nav"></div>
+    </nav>
 
-  <!-- Barra fixa do carrinho: só aparece com ao menos 1 item -->
-  <div class="barra-carrinho" id="barra-carrinho" hidden>
-    <button type="button" class="btn btn--primario barra-carrinho__botao" id="btn-abrir-carrinho" aria-haspopup="dialog">
-      <span id="barra-itens">Ver carrinho · 0 itens</span>
-      <span class="num" id="barra-total">R$ 0,00</span>
-    </button>
+    <main id="conteudo" tabindex="-1" aria-busy="true">
+      <div id="cardapio-container"></div>
+    </main>
+
+  </div>
+
+  <!-- Barra fixa do carrinho -->
+  <div class="barra-carrinho-fixa" id="barra-carrinho" hidden>
+    <div class="barra-carrinho-conteudo">
+      <button type="button" class="btn-abrir-carrinho" id="btn-abrir-carrinho" aria-haspopup="dialog">
+        <span id="barra-itens">Ver carrinho · 0 itens</span>
+        <span id="barra-total">R$ 0,00</span>
+      </button>
+    </div>
   </div>
 
   <!-- Folha do carrinho (bottom sheet) -->
-  <div class="overlay" id="overlay" aria-hidden="true"></div>
-  <section class="folha" id="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo" aria-hidden="true">
-    <div class="folha__topo" id="folha-topo">
-      <div class="folha__alca" aria-hidden="true"></div>
-      <div class="folha__cabecalho">
-        <h2 class="t-heading-sm" id="folha-titulo">Seu pedido</h2>
-        <button type="button" class="btn-redondo" id="btn-fechar-carrinho" aria-label="Fechar carrinho">
-          <svg class="icone" aria-hidden="true"><use href="#i-x"/></svg>
+  <div class="modal-overlay" id="overlay" aria-hidden="true">
+    <section class="folha-carrinho" id="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo">
+      <div class="folha-alca" id="folha-topo" aria-hidden="true"></div>
+      
+      <div class="folha-cabecalho">
+        <h2 id="folha-titulo">Seu pedido</h2>
+        <button type="button" class="btn-fechar-folha" id="btn-fechar-carrinho" aria-label="Fechar carrinho">
+          <svg class="icon" aria-hidden="true" style="width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2px;"><use href="#i-x"/></svg>
         </button>
       </div>
-    </div>
-    <div class="folha__corpo">
-      <ul id="carrinho-itens"></ul>
-    </div>
-    <div class="folha__rodape">
-      <p class="folha__total"><span class="t-strong">Total</span> <strong class="t-heading-sm num" id="carrinho-total">R$ 0,00</strong></p>
-      <button type="button" class="btn btn--primario btn--bloco" id="btn-finalizar" disabled>Enviar pedido</button>
-    </div>
-  </section>
+      
+      <div class="folha-corpo">
+        <ul id="carrinho-itens" style="list-style: none; display: flex; flex-direction: column; gap: var(--space-3);"></ul>
+      </div>
+      
+      <div class="folha-rodape">
+        <p class="folha-total"><span>Total</span> <strong id="carrinho-total">R$ 0,00</strong></p>
+        <button type="button" class="btn btn-primario" id="btn-finalizar" disabled>Enviar pedido</button>
+      </div>
+    </section>
+  </div>
 
-  <!-- Mensagens (toasts) -->
-  <div class="toasts" id="toasts"></div>
+  <div id="toasts"></div>
 
-  <!-- Ordem importa: SDK → cliente → lógica -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-client.js"></script>
   <script src="teste.js"></script>

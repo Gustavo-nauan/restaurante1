@@ -2,71 +2,186 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Acompanhar Pedido</title>
-  <link rel="stylesheet" href="css/base.css">
+  <!-- Google Fonts: Barlow Condensed & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/pedido.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.33.1/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
 </head>
 <body>
-  <div id="toast-container"></div>
-  
-  <div class="tela-pedido" id="app">
-    <!-- Skeleton Loading Inicial -->
-    <div id="loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50vh;">
-      <div class="skeleton-box" style="width: 100px; height: 20px; margin-bottom: 8px;"></div>
-      <div class="skeleton-box" style="width: 120px; height: 96px; margin-bottom: 32px;"></div>
-      <div class="skeleton-box" style="width: 250px; height: 32px;"></div>
+
+  <div class="app-container">
+
+    <!-- 1. Alerta de Erro de Rede (Oculto por padrão, acionado com .mostrar via JS) -->
+    <div id="erro-rede" class="banner-erro oculto" role="alert" aria-live="assertive">
+      <div class="spinner" aria-hidden="true"></div>
+      <span>Sem conexão. Tentando novamente...</span>
     </div>
 
-    <div id="conteudo" style="display: none;">
-      <div class="pedido-header">
-        <div class="pedido-label" id="loja-nome">Restaurante</div>
-        <div class="pedido-label">Seu pedido</div>
-        <h1 class="pedido-numero" id="pedido-numero">#--</h1>
+    <!-- 2. Cabeçalho da Loja (Reutilizado da Etapa 0) -->
+    <header class="header-loja">
+      <div class="loja-identidade">
+        <div class="loja-avatar" id="loja-sigla" aria-hidden="true"><!-- preenchido via JS --></div>
+        <div class="loja-dados">
+          <h1 id="loja-nome"><!-- preenchido via JS --></h1>
+          <p>Praça de Alimentação · Balcão Central</p>
+        </div>
       </div>
+      <a href="index.html" class="btn-cardapio-atalho" aria-label="Abrir cardápio">
+        Cardápio
+      </a>
+    </header>
 
-      <div class="pedido-mensagem" id="pedido-mensagem">
-        Carregando...
+    <!-- 3. Estado: Pedido Não Encontrado (Alternativo ao fluxo principal) -->
+    <section id="pedido-nao-encontrado" class="estado-vazio oculto" aria-labelledby="titulo-nao-encontrado">
+      <div class="icone-alerta-vazio" aria-hidden="true">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
       </div>
+      <div>
+        <h2 id="titulo-nao-encontrado" style="font-family: var(--font-display); font-size: var(--text-heading-sm); text-transform: uppercase;">
+          Pedido não encontrado
+        </h2>
+        <p style="font-size: var(--text-body-sm); color: var(--color-fumaca); margin-top: 4px;">
+          Verifique o link acessado ou faça um novo pedido no cardápio.
+        </p>
+      </div>
+      <a href="index.html" class="btn btn-primario" style="margin-top: var(--space-2);">
+        Voltar ao cardápio
+      </a>
+    </section>
 
-      <div class="timeline" id="timeline">
-        <div class="etapa" data-step="recebido">
-          <div class="etapa-circulo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-          <div class="etapa-texto">Pedido enviado</div>
-        </div>
-        <div class="etapa" data-step="confirmado">
-          <div class="etapa-circulo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-          <div class="etapa-texto">Aceito pela cozinha</div>
-        </div>
-        <div class="etapa" data-step="em_preparo">
-          <div class="etapa-circulo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-          <div class="etapa-texto">Em preparo</div>
-        </div>
-        <div class="etapa" data-step="pronto">
-          <div class="etapa-circulo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-          <div class="etapa-texto">Pronto</div>
-        </div>
-      </div>
+    <!-- 4. Conteúdo Principal do Pedido -->
+    <main class="main-content" id="conteudo-pedido">
 
-      <div class="pedido-itens" id="pedido-itens-container">
-        <h3>Resumo do Pedido</h3>
-        <div id="lista-itens"></div>
-      </div>
-      
-      <div style="margin-top: var(--space-8); text-align: center;">
-        <button id="btn-novo" class="btn-primario" style="display: none; width: 100%;">Fazer novo pedido</button>
-      </div>
-    </div>
+      <!-- Cabeçalho do Pedido -->
+      <section class="pedido-destaque" aria-labelledby="rotulo-pedido">
+        <p class="label" id="rotulo-pedido">Seu pedido</p>
+        <div class="pedido-numero" id="pedido-numero" aria-label="Número do pedido">
+          <!-- preenchido via JS -->
+        </div>
+        <div class="badge-status">
+          <span class="badge-status-ponto" aria-hidden="true"></span>
+          <span id="pedido-status"><!-- preenchido via JS --></span>
+        </div>
+      </section>
+
+      <!-- Mensagem de Status em Destaque -->
+      <section class="status-card" id="status-card-box" role="status" aria-live="polite">
+        <p class="status-titulo" id="status-message"><!-- preenchido via JS --></p>
+        <p class="status-orientacao" id="status-submessage"><!-- preenchido via JS --></p>
+      </section>
+
+      <!-- Linha do Tempo (Fluxo dos 4 Estados) -->
+      <section class="timeline-card" aria-labelledby="titulo-timeline">
+        <h2 class="timeline-titulo" id="titulo-timeline">Etapas do Pedido</h2>
+        
+        <ol class="timeline-lista" id="timeline">
+          
+          <!-- Estado 1: Recebido -->
+          <li class="timeline-item" data-status="recebido">
+            <div class="timeline-marcador" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke-width: 3px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="timeline-conteudo">
+              <h4>Pedido recebido</h4>
+              <p>Enviado para a cozinha</p>
+            </div>
+          </li>
+
+          <!-- Estado 2: Confirmado -->
+          <li class="timeline-item" data-status="confirmado">
+            <div class="timeline-marcador" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke-width: 3px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="timeline-conteudo">
+              <h4>Confirmado</h4>
+              <p>Cozinha aceitou o pedido</p>
+            </div>
+          </li>
+
+          <!-- Estado 3: Em Preparo -->
+          <li class="timeline-item" data-status="em_preparo">
+            <div class="timeline-marcador" aria-hidden="true"></div>
+            <div class="timeline-conteudo">
+              <h4>Em preparo</h4>
+              <p>Na chapa neste momento</p>
+            </div>
+          </li>
+
+          <!-- Estado 4: Pronto -->
+          <li class="timeline-item" data-status="pronto">
+            <div class="timeline-marcador" aria-hidden="true"></div>
+            <div class="timeline-conteudo">
+              <h4>Pronto para retirada</h4>
+              <p>Avisaremos assim que sair</p>
+            </div>
+          </li>
+
+        </ol>
+      </section>
+
+      <!-- Detalhes do Pedido (Colapsável) -->
+      <section class="detalhes-container" aria-label="Detalhes e itens do pedido">
+        <details>
+          <summary class="detalhes-resumo">
+            <span>Detalhes do pedido</span>
+            <svg class="icon detalhes-icone-seta" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </summary>
+          <div class="detalhes-corpo">
+            <div class="detalhes-meta">
+              <span>Data e Hora</span>
+              <time id="pedido-data" datetime=""><!-- preenchido via JS --></time>
+            </div>
+
+            <ul class="itens-lista" id="lista-itens">
+              <!-- preenchido via JS -->
+            </ul>
+
+            <div class="total-linha">
+              <span>Total Pago</span>
+              <span class="tabular-nums" id="pedido-total"><!-- preenchido via JS --></span>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Ações do Cliente -->
+      <section class="acoes-container" aria-label="Ações de navegação">
+        <button type="button" class="btn btn-secundario" id="btn-copiar" aria-label="Copiar número do pedido para o balcão">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copiar número do pedido
+        </button>
+
+        <a href="index.html" class="btn btn-primario">
+          Voltar ao cardápio
+        </a>
+      </section>
+
+    </main>
+
+    <!-- Rodapé Acessível -->
+    <footer class="app-footer" style="text-align: center; font-size: var(--text-caption); color: var(--color-fumaca);">
+      <p>Autoatendimento sem filas</p>
+    </footer>
+
   </div>
 
   <script src="supabase-client.js"></script>
