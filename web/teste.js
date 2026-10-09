@@ -124,8 +124,15 @@ function htmlCartao(p, eager = false) {
     .filter(Boolean)
     .join(' ');
 
-  const midia = p.imagem
-    ? `<img class="produto__foto" src="${esc(p.imagem)}" alt="${esc(p.nome)}" width="96" height="96" loading="${eager ? 'eager' : 'lazy'}">`
+  const obterUrlFoto = (src) => {
+    if (!src) return null;
+    if (src.startsWith('http://') || src.startsWith('https://')) return src;
+    return db.storage.from('produtos').getPublicUrl(src).data.publicUrl;
+  };
+  const fotoUrl = obterUrlFoto(p.imagem);
+
+  const midia = fotoUrl
+    ? `<img class="produto__foto" src="${esc(fotoUrl)}" alt="${esc(p.nome)}" width="96" height="96" loading="${eager ? 'eager' : 'lazy'}">`
     : `<div class="produto__placeholder" aria-hidden="true">${icone('talheres', 'icone--24')}</div>`;
 
   const botaoAdd = `
