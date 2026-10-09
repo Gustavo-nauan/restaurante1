@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Cardápio</title>
+  <meta name="description" content="Faça seu pedido pelo celular e acompanhe o preparo direto da cozinha.">
+  <meta name="theme-color" content="#FFF8F0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+  <!-- Ícones SVG inline (traço de 2px, pontas arredondadas, cor herdada) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-talheres" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M6 2v20"/><path d="M20 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+    <symbol id="i-menos" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-sacola" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#conteudo">Pular para o cardápio</a>
+
+  <header class="container loja" id="loja">
+    <div class="loja__logo" id="loja-logo" aria-hidden="true"></div>
+    <div class="loja__texto">
+      <h1 class="t-heading loja__nome" id="titulo">Cardápio</h1>
+      <p class="t-body-sm t-muted" id="loja-endereco" hidden></p>
+    </div>
+  </header>
+
+  <nav class="abas" id="abas" aria-label="Categorias do cardápio">
+    <div class="container">
+      <div class="abas__lista" id="abas-lista">
+        <span class="skeleton skeleton--aba"></span>
+        <span class="skeleton skeleton--aba"></span>
+        <span class="skeleton skeleton--aba"></span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container com-barra" id="conteudo" tabindex="-1" aria-busy="true">
+    <div id="cardapio-container">
+      <div class="lista-produtos" aria-hidden="true" style="padding-top: var(--space-6)">
+        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
+        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
+        <div class="skeleton--cartao"><div><span class="skeleton skeleton__linha"></span><span class="skeleton skeleton__linha skeleton__linha--curta"></span></div><span class="skeleton skeleton__foto"></span></div>
+      </div>
+      <p class="sr-only">Carregando cardápio…</p>
+    </div>
+  </main>
+
+  <!-- Barra fixa do carrinho: só aparece com ao menos 1 item -->
+  <div class="barra-carrinho" id="barra-carrinho" hidden>
+    <button type="button" class="btn btn--primario barra-carrinho__botao" id="btn-abrir-carrinho" aria-haspopup="dialog">
+      <span id="barra-itens">Ver carrinho · 0 itens</span>
+      <span class="num" id="barra-total">R$ 0,00</span>
+    </button>
+  </div>
+
+  <!-- Folha do carrinho (bottom sheet) -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <section class="folha" id="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo" aria-hidden="true">
+    <div class="folha__topo" id="folha-topo">
+      <div class="folha__alca" aria-hidden="true"></div>
+      <div class="folha__cabecalho">
+        <h2 class="t-heading-sm" id="folha-titulo">Seu pedido</h2>
+        <button type="button" class="btn-redondo" id="btn-fechar-carrinho" aria-label="Fechar carrinho">
+          <svg class="icone" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="folha__corpo">
+      <ul id="carrinho-itens"></ul>
+    </div>
+    <div class="folha__rodape">
+      <p class="folha__total"><span class="t-strong">Total</span> <strong class="t-heading-sm num" id="carrinho-total">R$ 0,00</strong></p>
+      <button type="button" class="btn btn--primario btn--bloco" id="btn-finalizar" disabled>Enviar pedido</button>
+    </div>
+  </section>
+
+  <!-- Mensagens (toasts) -->
+  <div class="toasts" id="toasts"></div>
+
+  <!-- Ordem importa: SDK → cliente → lógica -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="teste.js"></script>
+</body>
+</html>

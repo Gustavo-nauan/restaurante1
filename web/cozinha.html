@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel da Cozinha</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; }
+    #login, #painel { max-width: 1100px; margin-inline: auto; }
+    #painel { display: none; }
+    #pedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .pedido { border: 2px solid #ccc; border-radius: 8px; padding: .75rem; }
+    .pedido.confirmado { border-color: #e6a700; }
+    .pedido.em_preparo { border-color: #1976d2; }
+    .pedido.pronto { border-color: #1b7f3b; }
+    .pedido ul { padding-left: 1.1rem; }
+    .obs { color: #b00020; font-size: .9em; }
+    #msg { color: #b00020; }
+  </style>
+</head>
+<body>
+  <section id="login">
+    <h1>Cozinha — entrar</h1>
+    <form id="form-login">
+      <input id="email" type="email" placeholder="E-mail" required>
+      <input id="senha" type="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="msg" role="alert"></p>
+  </section>
+
+  <section id="painel">
+    <h1>Pedidos em andamento</h1>
+    <button id="btn-som">🔔 Ativar som</button>
+    <div id="pedidos"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-client.js"></script>
+  <script>
+    const PROXIMO = { confirmado: 'em_preparo', em_preparo: 'pronto', pronto: 'finalizado' };
+    const ROTULO = { confirmado: 'Iniciar preparo', em_preparo: 'Marcar pronto', pronto: 'Finalizar' };
+
+    const pedidosAbertos = new Map();
+    let audioCtx = null;
+    let canal = null;
+
+    const esc = (s) =>
+      String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const SELECT_PEDIDO = 'id, status, total, criado_em, restaurante_id, itens_pedido ( nome_produto, quantidade, observacao )';
+
+    function iniciarPainelCozinha(restauranteId) {
+      if (canal) db.removeChannel(canal);
+
+      canal = db
+        .channel('cozinha-canal')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'pedidos', filter: `restaurante_id=eq.${restauranteId}` },
+          async (payload) => {
+            if (payload.eventType === 'DELETE') {
+              pedidosAbertos.delete(payload.old.id);
+              return renderizarPainel();
+            }
+            const novo = payload.eventType === 'INSERT';
+            await atualizarPedido(payload.new.id);
+            if (novo) tocarAlertaSonoro();
+          }
+        )
+        // Recarrega a lista ao conectar E ao reconectar (não perde pedidos durante quedas)
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') carregarPedidosAtuais(restauranteId);
+        });
+    }
+
+    async function carregarPedidosAtuais(restauranteId) {
+      const { data, error } = await db
+        .from('pedidos')
+        .select(SELECT_PEDIDO)
+        .eq('restaurante_id', restauranteId)
+        .neq('status', 'finalizado')
+        .order('criado_em');
+      if (error) return console.error('Erro ao carregar pedidos:', error.message);
+      pedidosAbertos.clear();
+      data.forEach((p) => pedidosAbertos.set(p.id, p));
+      renderizarPainel();
+    }
+
+    // Busca o pedido completo (com itens) e o insere/atualiza/remove da tela
+    async function atualizarPedido(id) {
+      const { data, error } = await db.from('pedidos').select(SELECT_PEDIDO).eq('id', id).single();
+      if (error) return console.error('Erro ao buscar pedido:', error.message);
+      if (data.status === 'finalizado') pedidosAbertos.delete(id);
+      else pedidosAbertos.set(id, data);
+      renderizarPainel();
+    }
+
+    function renderizarPainel() {
+      const lista = [...pedidosAbertos.values()].sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em));
+      document.getElementById('pedidos').innerHTML = lista
+        .map((p) => `
+          <article class="pedido ${esc(p.status)}">
+            <h3>#${esc(p.id.slice(0, 8))} — ${new Date(p.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</h3>
+            <p><strong>${esc(p.status.replace('_', ' '))}</strong></p>
+            <ul>
+              ${(p.itens_pedido || [])
+                .map((i) => `<li>${i.quantidade}× ${esc(i.nome_produto)}${i.observacao ? `<div class="obs">Obs: ${esc(i.observacao)}</div>` : ''}</li>`)
+                .join('')}
+            </ul>
+            ${PROXIMO[p.status] ? `<button data-id="${esc(p.id)}" data-status="${PROXIMO[p.status]}">${ROTULO[p.status]}</button>` : ''}
+          </article>`)
+        .join('');
+    }
+
+    async function alterarStatusPedido(pedidoId, novoStatus) {
+      const { error } = await db.from('pedidos').update({ status: novoStatus }).eq('id', pedidoId);
+      if (error) alert('Erro ao atualizar status: ' + error.message);
+      // A tela atualiza via evento realtime (UPDATE)
+    }
+
+    function tocarAlertaSonoro() {
+      if (!audioCtx) return; // navegadores só liberam áudio após um clique do usuário
+      const osc = audioCtx.createOscillator();
+      const ganho = audioCtx.createGain();
+      osc.connect(ganho).connect(audioCtx.destination);
+      ganho.gain.value = 0.15;
+      osc.frequency.value = 880;
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.25);
+    }
+
+    // ---------- Eventos / login ----------
+    document.getElementById('btn-som').addEventListener('click', (e) => {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      e.target.textContent = '🔔 Som ativado';
+      tocarAlertaSonoro();
+    });
+
+    document.getElementById('pedidos').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-id]');
+      if (btn) alterarStatusPedido(btn.dataset.id, btn.dataset.status);
+    });
+
+    async function entrarNoPainel() {
+      const { data: func, error } = await db.from('funcionarios').select('restaurante_id').limit(1).maybeSingle();
+      if (error || !func) {
+        document.getElementById('msg').textContent = 'Este usuário não está vinculado a nenhum restaurante.';
+        await db.auth.signOut();
+        return;
+      }
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('painel').style.display = 'block';
+      iniciarPainelCozinha(func.restaurante_id);
+    }
+
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await db.auth.signInWithPassword({
+        email: document.getElementById('email').value,
+        password: document.getElementById('senha').value,
+      });
+      if (error) return (document.getElementById('msg').textContent = 'Login inválido: ' + error.message);
+      entrarNoPainel();
+    });
+
+    // Se já houver sessão salva, entra direto
+    db.auth.getSession().then(({ data }) => { if (data.session) entrarNoPainel(); });
+  </script>
+</body>
+</html>
